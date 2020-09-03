@@ -33,6 +33,9 @@ public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> i
     public Boolean updateEmp(Employee employee){
         System.out.println("updateEmp "+employee);
         Boolean result = this.updateById(employee);
+        if (result){
+            employee = this.getEmpById(employee.getId());
+        }
         System.out.println(result);
         return result;
     }
