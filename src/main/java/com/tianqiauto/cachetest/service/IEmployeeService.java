@@ -10,6 +10,6 @@ import org.springframework.cache.annotation.Cacheable;
  */
 public interface IEmployeeService extends IService<Employee> {
     Employee getEmpById(Integer id) ;
-    Boolean updateEmp(Employee employee);
+    Employee updateEmp(Employee employee);
     void deleteEmp(Integer id);
 }

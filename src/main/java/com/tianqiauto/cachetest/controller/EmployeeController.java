@@ -21,12 +21,8 @@ public class EmployeeController {
 
     @GetMapping("/emp")
     public Employee updateEmp(Employee employee){
-        Boolean a = employService.updateEmp(employee);
-        if(a ){
-            return employee;
-        }else{
-            return null;
-        }
+        Employee a = employService.updateEmp(employee);
+        return a;
     }
 
     @GetMapping("/delEmp")

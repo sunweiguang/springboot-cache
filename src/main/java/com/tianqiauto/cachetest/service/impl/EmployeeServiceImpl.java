@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 @CacheConfig(cacheNames = "emp")
 public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> implements IEmployeeService {
 
-    @Cacheable(cacheNames = {"emp"})
+    @Cacheable( key = "#id")
     public Employee getEmpById(Integer id){
         System.out.println("查询" + id + "号员工!");
         Employee employee = this.getById(id);
@@ -29,15 +29,14 @@ public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> i
     //    运行：
     //        1.先调用目标方法
     //        2.将目标方法的结果缓存起来
-    @CachePut(value = "#employee",key = "#employee.id", unless = "!#result")
-    public Boolean updateEmp(Employee employee){
+    @CachePut(key = "#employee.id")
+    public Employee updateEmp(Employee employee){
         System.out.println("updateEmp "+employee);
         Boolean result = this.updateById(employee);
         if (result){
             employee = this.getEmpById(employee.getId());
         }
-        System.out.println(result);
-        return result;
+        return employee;
     }
     //       @CacheEvict:缓存清除
     //       key:指定要清除的数据
