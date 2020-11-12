@@ -1,11 +1,15 @@
+body {
+    position: relative;
+}
+
 .calculator {
     width: 330px;
     height: 290px;
     padding-left: 5px;
     padding-top: 5px;
-    position: relative;
-    background: #fff;
-    box-shadow: 0 0 5px rgb(43, 42, 42);
+    position: absolute;
+    background: #8f8f8f;
+    box-shadow: 0 0 5px rgb(153 153 153);
 }
 
 .calculator .num_key {
@@ -20,7 +24,8 @@
     font-weight: bold;
     margin: 5px;
     color: #3e3e3e;
-    box-shadow: 0px 2px 1px #000;
+    border: 1px solid #696969;
+    box-shadow: 0px 2px 1px #6b6b6b;
 }
 
 .calculator .btn_key {
@@ -34,7 +39,8 @@
     border-radius: 5px;
     font-weight: bold;
     margin: 5px;
-    box-shadow: 0px 2px 1px #000;
+    border: 1px solid #696969;
+    box-shadow: 0px 2px 1px #6b6b6b;
 }
 
 .calculator .num_key:hover {
