@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tianqiauto.mybatis.list.mapper.ClassMapper">
+    <resultMap id="cmap" type="com.tianqiauto.mybatis.list.entity.Class">
+        <id property="id" column="id"/>
+        <!-- 集合不在使用association 而是使用collection -->
+        <collection property="studentsList" select="com.tianqiauto.mybatis.list.mapper.StudentMapper.selByCid" column="id"/>
+
+    </resultMap>
+    <select id="selAll" resultMap="cmap">
+        select * from Class
+    </select>
+</mapper>

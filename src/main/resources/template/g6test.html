@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tutorial Demo</title>
+</head>
+<body>
+<div id="mountNode"></div>
+<!-- 引入 G6 -->
+<script src="https://gw.alipayobjects.com/os/antv/pkg/_antv.g6-3.1.1/build/g6.js"></script>
+
+<!-- 引入 Minimap -->
+<script src="https://gw.alipayobjects.com/os/antv/pkg/_antv.g6-3.1.1/build/minimap.js"></script>
+
+<script>
+
+    const Util = G6.Util;
+
+    G6.registerNode('background-animate', {
+        afterDraw(cfg, group) {
+            let r = cfg.size / 2;
+            if (isNaN(r)) {
+                r = cfg.size[0] / 2;
+            };
+            // 第一个背景圆
+            const back1 = group.addShape('circle',{
+                zIndex: -3,
+                attrs: {
+                    x: 0,
+                    y: 0,
+                    r,
+                    fill: cfg.color,
+                    opacity: 0.6
+                }
+            });
+            // 第二个背景圆
+            const back2 = group.addShape('circle',{
+                zIndex: -2,
+                attrs: {
+                    x: 0,
+                    y: 0,
+                    r,
+                    fill: 'blue', // 为了显示清晰，随意设置了颜色
+                    opacity: 0.6
+                }
+            });
+            // 第三个背景圆
+            const back3 = group.addShape('circle',{
+                zIndex: -1,
+                attrs: {
+                    x: 0,
+                    y: 0,
+                    r,
+                    fill: 'green',
+                    opacity: 0.6
+                }
+            });
+            group.sort(); // 排序，根据 zIndex 排序
+
+            // 第一个背景圆逐渐放大，并消失
+            back1.animate({
+                r: r + 10,
+                opacity: 0.1,
+                repeat: true // 循环
+            }, 3000, 'easeCubic', null, 0) // 无延迟
+
+            // 第二个背景圆逐渐放大，并消失
+            back2.animate({
+                r: r + 10,
+                opacity: 0.1,
+                repeat: true // 循环
+            }, 3000, 'easeCubic', null, 1000) // 1 秒延迟
+
+            // 第三个背景圆逐渐放大，并消失
+            back3.animate({
+                r: r + 10,
+                opacity: 0.1,
+                repeat: true // 循环
+            }, 3000, 'easeCubic', null, 2000) // 2 秒延迟
+        }
+    }, 'circle');
+    // 放大、变小动画
+    G6.registerNode('circle-animate', {
+        afterDraw(cfg, group) {
+            // 获取该节点上的第一个图形
+            const shape = group.get('children')[0];
+            console.log(shape);
+            // 该图形的动画
+            shape.animate({
+                // 动画重复
+                repeat: true,
+                // 每一帧的操作，入参 ratio：这一帧的比例值（Number）。返回值：这一帧需要变化的参数集（Object）。
+                onFrame(ratio) {
+                    // 先变大、再变小
+                    const diff = ratio <=0.5 ? ratio * 10 : (1 - ratio) * 10;
+                    let radius = cfg.size;
+                    if (isNaN(radius)) radius = radius[0];
+                    // 返回这一帧需要变化的参数集，这里只包含了半径
+                    return {
+                        r: radius / 2 + diff
+                    }
+                }
+            }, 3000, 'easeCubic'); // 一次动画持续的时长为 3000，动画效果为 'easeCubic'
+        }
+    }, 'circle'); // 该自定义节点继承了内置节点 'circle'，除了被复写的 afterDraw 方法外，其他按照 'circle' 里的函数执行。
+
+
+
+    G6.registerEdge('circle-running', {
+        afterDraw(cfg, group) {
+            // 获得当前边的第一个图形，这里是边本身的 path
+            const shape = group.get('children')[0];
+            // 边 path 的起点位置
+            const startPoint = shape.getPoint(0);
+
+            // 添加红色 circle 图形
+            const circle = group.addShape('circle', {
+                attrs: {
+                    x: startPoint.x,
+                    y: startPoint.y,
+                    fill: 'red',
+                    r: 3
+                }
+            });
+
+            // 对红色圆点添加动画
+            circle.animate({
+                // 动画重复
+                repeat: true,
+                // 每一帧的操作，入参 ratio：这一帧的比例值（Number）。返回值：这一帧需要变化的参数集（Object）。
+                onFrame(ratio) {
+                    // 根据比例值，获得在边 path 上对应比例的位置。
+                    const tmpPoint = shape.getPoint(ratio);
+                    // 返回需要变化的参数集，这里返回了位置 x 和 y
+                    return {
+                        x: tmpPoint.x,
+                        y: tmpPoint.y
+                    };
+                }
+            }, 3000); // 一次动画的时间长度
+        }
+    }, 'cubic');  // 该自定义边继承内置三阶贝塞尔曲线 cubic
+
+    // 定义数据源
+    const localData = {
+        // 点集
+        nodes: [{
+            id: 'node1',
+            x: 50,
+            y: 50,
+            shape: 'circle-animate',
+            style: {
+                stroke: '#000',
+                lineWidth: 1
+            }
+        },{
+            id: 'node2',
+            x: 300,
+            y: 200,
+            shape: 'background-animate'
+        },{
+            id: 'node3',
+            x: 330,
+            y: 200
+        },{
+            id: 'node4',
+            x: 350,
+            y: 400
+        },{
+            id: 'node5',
+            x: 370,
+            y: 300
+        }],
+        // 边集
+        edges: [
+            // 表示一条从 node1 节点连接到 node2 节点的边
+            {
+                source: 'node1',
+                target: 'node2',
+                shape: 'circle-running'
+            },{
+                source: 'node1',
+                target: 'node3'
+            },{
+                source: 'node2',
+                target: 'node3'
+            },{
+                source: 'node3',
+                target: 'node4'
+            },{
+                source: 'node4',
+                target: 'node5'
+            }
+        ]
+    };
+    // 实例化 minimap 插件
+    const minimap = new Minimap({
+        size: [ 100, 100 ],
+        className: "minimap",
+        type: 'delegate'
+    });
+
+
+
+    const graph = new G6.Graph({
+        container: 'mountNode',
+        plugins: [ minimap ],         // 将 minimap 实例配置到图上
+        width: 800,
+        height: 400,
+        // renderer:'svg',
+        animate: true,            // Boolean，可选，切换布局时是否使用动画过度
+        animateCfg: {
+            duration: 500,         // Number，一次动画的时长
+            easing: 'linearEasing' // String，动画函数，可选项：''
+        },
+        // 节点默认配置
+        defaultNode: {
+            labelCfg: {
+                style: {
+                    fill: '#fff'
+                }
+            },
+            size: [40, 40]
+        },
+        // 边默认配置
+        defaultEdge: {
+            labelCfg: {
+                autoRotate: true
+            }
+        },
+        // 节点在各状态下的样式
+        nodeStateStyles: {
+            // hover 状态为 true 时的样式
+            hover: {
+                fill: 'orange'
+            },
+            // click 状态为 true 时的样式
+            click: {
+                stroke: '#000',
+                lineWidth: 3
+            },
+            selected:{
+                fill: 'orange'
+            }
+        },
+        // 边在各状态下的样式
+        edgeStateStyles: {
+            // click 状态为 true 时的样式
+            click: {
+                stroke: 'steelblue'
+            }
+        },
+        // 布局
+        layout: {
+            type: 'force',
+            linkDistance: 100,
+            preventOverlap: true,
+            nodeStrength: -30,
+            edgeStrength: 0.1
+        },
+        // 内置交互
+        modes: {
+            default: [ {
+                type: 'brush-select',
+                trigger: 'drag'
+            },/*'drag-canvas', */'zoom-canvas', 'drag-node','click-select']
+        },
+    });
+
+    const main = async () => {
+
+        const nodes = localData.nodes;
+        const edges = localData.edges;
+        nodes.forEach(node => {
+            if (!node.style) {
+                node.style = {};
+            }
+            node.style.lineWidth = 1;
+            node.style.stroke = '#666';
+            node.style.fill = 'steelblue';
+            switch (node.class) {
+                case 'c0': {
+                    node.shape = 'circle';
+                    node.size = 30;
+                    break;
+                }
+                case 'c1': {
+                    node.shape = 'rect';
+                    node.size = [ 35, 20 ];
+                    break;
+                }
+                case 'c2': {
+                    node.shape = 'ellipse';
+                    node.size = [ 35, 20 ];
+                    break;
+                }
+            }
+        });
+        edges.forEach(edge => {
+            if (!edge.style) {
+                edge.style = {};
+            }
+            edge.style.lineWidth = edge.weight;
+            edge.style.opacity = 0.6;
+            edge.style.stroke = 'grey';
+        });
+
+        graph.data(localData);
+        graph.render();
+
+        // 监听鼠标进入节点
+        graph.on('node:mouseenter', e => {
+            const nodeItem = e.item;
+            // 设置目标节点的 hover 状态 为 true
+            graph.setItemState(nodeItem, 'hover', true);
+        });
+        // 监听鼠标离开节点
+        graph.on('node:mouseleave', e => {
+            const nodeItem = e.item;
+            // 设置目标节点的 hover 状态 false
+            graph.setItemState(nodeItem, 'hover', false);
+        });
+        // 监听鼠标点击节点
+        graph.on('node:click', e => {
+            // 先将所有当前有 click 状态的节点的 click 状态置为 false
+            const clickNodes = graph.findAllByState('node', 'click');
+            clickNodes.forEach(cn => {
+                graph.setItemState(cn, 'click', false);
+            });
+            const nodeItem = e.item;
+            // 设置目标节点的 click 状态 为 true
+            graph.setItemState(nodeItem, 'click', true);
+        });
+        // 监听鼠标点击节点
+        graph.on('edge:click', e => {
+            // 先将所有当前有 click 状态的边的 click 状态置为 false
+            const clickEdges = graph.findAllByState('edge', 'click');
+            clickEdges.forEach(ce => {
+                graph.setItemState(ce, 'click', false);
+            });
+            const edgeItem = e.item;
+            // 设置目标边的 click 状态 为 true
+            graph.setItemState(edgeItem, 'click', true);
+        });
+    };
+
+    main();
+</script>
+</body>
+</html>

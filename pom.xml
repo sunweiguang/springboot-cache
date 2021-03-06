@@ -98,6 +98,16 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
         </plugins>
+
+            <resources>
+            <!-- mapper.xml文件在java目录下 -->
+            <resource>
+                <directory>src/main/java</directory>
+                <includes>
+                    <include>**/*.xml</include>
+                </includes>
+            </resource>
+            </resources>
     </build>
 
 </project>

@@ -20,13 +20,13 @@ public class CodeGenerator {
      * 包的基础路径
      */
     /*包名*/
-    private static final String BASE_PACKAGE_URL = "com.tianqiauto";
+    private static final String BASE_PACKAGE_URL = "com.tianqiauto.mybatis";
     /*作者名*/
     private static final String AUTHOR = "TIS-swg";//作者
     /*模块*/
-    private static final String MODULE_NAME = "cachetest";//模块
+    private static final String MODULE_NAME = "list";//模块
     /*表名*/
-    private static final String TABLE_NAME = "employee";//表名
+    private static final String TABLE_NAME = "student";//表名
 
     /**
      * 数据库 URL
